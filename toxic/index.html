@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Toxic Mode | Stop Pretending</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg: #050505;
+            --text: #FFFFFF;
+            --accent: #FF0033;
+            --muted: #666666;
+            --border: #222222;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* GLITCH ANIMATION */
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-3px, 3px); text-shadow: -2px 0 var(--accent); }
+            40% { transform: translate(-3px, -3px); text-shadow: 2px 0 var(--accent); }
+            60% { transform: translate(3px, 3px); text-shadow: -2px 0 var(--text); }
+            80% { transform: translate(3px, -3px); text-shadow: 2px 0 var(--text); }
+            100% { transform: translate(0); text-shadow: none; }
+        }
+
+        .glitch-active {
+            animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+        }
+
+        /* HEADER */
+        .header {
+            padding: 80px 24px 40px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header h1 {
+            font-weight: 900;
+            font-size: clamp(36px, 6vw, 64px);
+            letter-spacing: -0.03em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .header p {
+            font-weight: 400;
+            font-size: clamp(16px, 2vw, 20px);
+            color: var(--muted);
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        .header p span {
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        /* CATEGORIES */
+        .categories {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 40px 24px 24px;
+        }
+
+        .cat-btn {
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--muted);
+            padding: 12px 24px;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .cat-btn:hover {
+            color: var(--text);
+            border-color: var(--text);
+        }
+
+        .cat-btn.active {
+            background: var(--text);
+            color: var(--bg);
+            border-color: var(--text);
+        }
+
+        /* MAIN QUOTE DISPLAY */
+        .quote-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0 24px 80px;
+            min-height: 40vh;
+        }
+
+        .quote-text {
+            font-weight: 900;
+            font-size: clamp(40px, 8vw, 96px);
+            line-height: 1.05;
+            letter-spacing: -0.04em;
+            text-align: center;
+            max-width: 1000px;
+            color: var(--text);
+        }
+
+        .refresh-btn {
+            margin-top: 48px;
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            padding: 12px 24px;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .refresh-btn:hover {
+            color: var(--text);
+            border-color: var(--text);
+        }
+
+        /* FOOTER IDENTITY CHALLENGE */
+        .footer-challenge {
+            padding: 80px 24px;
+            text-align: center;
+            background: #000000;
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .footer-challenge h2 {
+            font-weight: 900;
+            font-size: 32px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .footer-challenge p {
+            color: var(--muted);
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+
+        .prove-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .prove-btn {
+            background: var(--accent);
+            color: #FFFFFF;
+            border: none;
+            padding: 20px 48px;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 900;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .prove-btn:hover {
+            background: #D9002B;
+            transform: scale(1.02);
+        }
+
+        .share-tag {
+            position: absolute;
+            top: -16px;
+            right: -24px;
+            background: #FFFFFF;
+            color: #000000;
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            padding: 6px 10px;
+            transform: rotate(6deg);
+            pointer-events: none;
+            box-shadow: 2px 2px 0 var(--accent);
+            letter-spacing: 0.05em;
+        }
+
+        /* SHARE MODAL */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 24px;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal-content {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px; right: 20px;
+            background: none; border: none;
+            color: var(--muted); font-size: 24px;
+            cursor: pointer;
+        }
+
+        .modal-close:hover { color: var(--text); }
+
+        .preview-canvas-container {
+            width: 100%;
+            height: 45vh; /* Responsive height */
+            max-height: 400px;
+            aspect-ratio: 9/16;
+            background: #111;
+            margin: 0 auto 24px;
+            border: 1px solid var(--border);
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: contain;
+        }
+
+        .modal-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .action-btn {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 16px;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn.primary {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        .action-btn:hover { border-color: var(--text); }
+        .action-btn.primary:hover {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        @media (max-width: 600px) {
+            .cat-btn { padding: 10px 16px; font-size: 12px; }
+            .modal-content { padding: 24px; }
+            .share-tag { right: -10px; top: -20px; font-size: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <h1>Stop pretending<br>you’re trying.</h1>
+        <p>Most people say they want change.<br><span>Few people act like it.</span></p>
+    </header>
+
+    <main>
+        <nav class="categories" id="categories">
+            <button class="cat-btn active" data-cat="study">Study</button>
+            <button class="cat-btn" data-cat="gym">Gym</button>
+            <button class="cat-btn" data-cat="work">Work</button>
+            <button class="cat-btn" data-cat="discipline">Discipline</button>
+            <button class="cat-btn" data-cat="life">Life</button>
+        </nav>
+
+        <div class="quote-wrapper">
+            <div class="quote-text" id="quote-text">Select your poison.</div>
+            <button class="refresh-btn" id="btn-refresh">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 1 0 2.13-5.88L21 8"></path></svg>
+                Generate New Truth
+            </button>
+        </div>
+    </main>
+
+    <footer class="footer-challenge">
+        <h2>Still scrolling?</h2>
+        <p>Most people close this page and go back to comfort.</p>
+        <div class="prove-wrapper">
+            <div class="share-tag">Share it with the world</div>
+            <button class="prove-btn" id="prove-btn">Prove you’re different.</button>
+        </div>
+    </footer>
+
+    <div class="modal-overlay" id="share-modal">
+        <div class="modal-content">
+            <button class="modal-close" id="close-modal">&times;</button>
+            <h3 style="text-transform: uppercase; font-weight: 900; margin-bottom: 24px; font-size: 20px;">Share to Story</h3>
+            
+            <div class="preview-canvas-container">
+                <canvas id="export-canvas" width="1080" height="1920"></canvas>
+            </div>
+
+            <div class="modal-actions">
+                <button class="action-btn primary" id="btn-share">Share Image</button>
+                <button class="action-btn" id="btn-copy">Copy Text Instead</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const TOXIC_LINES = {
+            study: [
+                "Someone less talented than you is studying right now.",
+                "You don’t hate studying. You hate effort.",
+                "If you actually cared, you’d already be doing it.",
+                "The exam isn’t scary. Your discipline is weak.",
+                "You’re not tired. You’re distracted.",
+                "Stop watching productivity videos and start working."
+            ],
+            gym: [
+                "Nobody respects the version of you that quits early.",
+                "Your future body is built today. You skipped it.",
+                "Comfort built your current body.",
+                "Weak excuses create weak people.",
+                "The weight doesn’t care about your mood.",
+                "Discipline is heavier than the bar."
+            ],
+            work: [
+                "Someone else wants your job more than you do.",
+                "Your competition woke up earlier.",
+                "Talent without discipline is decoration.",
+                "You’re not overwhelmed. You’re disorganized.",
+                "Comfort is the slowest form of failure."
+            ],
+            discipline: [
+                "You say “tomorrow” a lot.",
+                "Nobody sabotaged you. You just didn’t execute.",
+                "Your habits are your real goals.",
+                "Motivation didn’t fail you. Discipline did.",
+                "Your future self is embarrassed."
+            ],
+            life: [
+                "The life you want requires a different version of you.",
+                "Nobody is coming to fix this for you.",
+                "You’re capable. You’re just comfortable.",
+                "Comfort is expensive. It costs your future.",
+                "Every day you delay becomes a year later."
+            ]
+        };
+
+        const quoteEl = document.getElementById('quote-text');
+        const catBtns = document.querySelectorAll('.cat-btn');
+        const refreshBtn = document.getElementById('btn-refresh');
+        
+        let currentCategory = 'study';
+        let currentQuote = "";
+        let categoryIndexes = { study: 0, gym: 0, work: 0, discipline: 0, life: 0 };
+
+        // Shuffle arrays for randomness
+        for (let cat in TOXIC_LINES) {
+            TOXIC_LINES[cat] = TOXIC_LINES[cat].sort(() => Math.random() - 0.5);
+        }
+
+        function triggerGlitch() {
+            quoteEl.classList.remove('glitch-active');
+            void quoteEl.offsetWidth; // Trigger reflow
+            quoteEl.classList.add('glitch-active');
+        }
+
+        function showQuote(category) {
+            currentCategory = category;
+            const lines = TOXIC_LINES[category];
+            let idx = categoryIndexes[category];
+            
+            currentQuote = lines[idx];
+            quoteEl.textContent = currentQuote;
+            triggerGlitch();
+
+            categoryIndexes[category] = (idx + 1) % lines.length;
+        }
+
+        // Setup Category Listeners
+        catBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                catBtns.forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                showQuote(e.target.dataset.cat);
+            });
+        });
+
+        // Setup Refresh Listener
+        refreshBtn.addEventListener('click', () => {
+            showQuote(currentCategory);
+        });
+
+        // Init first quote
+        showQuote('study');
+
+
+        // --- SHARE & EXPORT LOGIC (9:16 IG STORY) ---
+        const proveBtn = document.getElementById('prove-btn');
+        const modal = document.getElementById('share-modal');
+        const closeModal = document.getElementById('close-modal');
+        const canvas = document.getElementById('export-canvas');
+        const ctx = canvas.getContext('2d');
+        const btnShare = document.getElementById('btn-share');
+
+        // Check if Native Web Share for files is supported
+        const canShareFiles = navigator.canShare && navigator.canShare({ files: [new File([''], 'test.png', {type: 'image/png'})] });
+        if (!canShareFiles) {
+            btnShare.textContent = "Download Image"; // Fallback text for desktop
+        }
+
+        proveBtn.addEventListener('click', () => {
+            modal.classList.add('active');
+            renderCanvas();
+        });
+
+        closeModal.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+        function wrapText(context, text, x, y, maxWidth, lineHeight) {
+            const words = text.split(' ');
+            let line = '';
+            let currentY = y;
+
+            for(let n = 0; n < words.length; n++) {
+                let testLine = line + words[n] + ' ';
+                let metrics = context.measureText(testLine);
+                let testWidth = metrics.width;
+                if (testWidth > maxWidth && n > 0) {
+                    context.fillText(line, x, currentY);
+                    line = words[n] + ' ';
+                    currentY += lineHeight;
+                } else {
+                    line = testLine;
+                }
+            }
+            context.fillText(line, x, currentY);
+        }
+
+        function renderCanvas() {
+            // 9:16 Background
+            ctx.fillStyle = '#050505';
+            ctx.fillRect(0, 0, 1080, 1920);
+
+            // Red accent dot/line
+            ctx.fillStyle = '#FF0033';
+            ctx.fillRect(80, 500, 30, 30);
+
+            // Typography (Centered-ish vertically for Stories)
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '900 96px "DM Sans", sans-serif';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+
+            wrapText(ctx, currentQuote, 80, 600, 920, 110);
+
+            // Footer branding (DAYTALE MOTIVATION)
+            const bottomY = 1700;
+            ctx.font = '700 48px "DM Sans", sans-serif';
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillText("DAYTALE", 80, bottomY);
+            
+            let metrics = ctx.measureText("DAYTALE  ");
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.fillText("MOTIVATION", 80 + metrics.width, bottomY);
+        }
+
+        // Native Share or Fallback Download
+        btnShare.addEventListener('click', async () => {
+            canvas.toBlob(async (blob) => {
+                const file = new File([blob], 'daytale_motivation.png', { type: 'image/png' });
+                
+                if (canShareFiles) {
+                    try {
+                        await navigator.share({
+                            files: [file],
+                            title: 'Daytale Motivation',
+                        });
+                    } catch (err) {
+                        console.log("Share cancelled or failed.", err);
+                    }
+                } else {
+                    // Fallback to manual download if native share is unsupported
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.download = 'daytale_motivation.png';
+                    link.href = url;
+                    link.click();
+                    URL.revokeObjectURL(url);
+                }
+            }, 'image/png');
+        });
+
+        // Copy Text
+        document.getElementById('btn-copy').addEventListener('click', (e) => {
+            navigator.clipboard.writeText(currentQuote).then(() => {
+                const originalText = e.target.textContent;
+                e.target.textContent = "COPIED TO CLIPBOARD!";
+                e.target.style.color = "var(--text)";
+                setTimeout(() => {
+                    e.target.textContent = originalText;
+                    e.target.style.color = "";
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>
