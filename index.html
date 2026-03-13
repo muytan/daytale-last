@@ -515,10 +515,96 @@
         </div>
     </section>
 
-    <section class="band">
-        <div class="band-text">Your drawings stay on your device. No account. No tracking. Just yours.</div>
-        <a href="/archive" class="band-cta">open my journal</a>
-    </section>
+  <style>
+    .motivation-band {
+        background-color: var(--text);
+        padding: 100px 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        color: var(--bg);
+    }
+
+    .motivation-head {
+        font-family: 'Cormorant Garamond', serif;
+        font-style: italic;
+        font-weight: 400;
+        font-size: clamp(40px, 6vw, 64px);
+        line-height: 1.1;
+        margin-bottom: 16px;
+    }
+
+    .motivation-sub {
+        font-family: 'DM Sans', sans-serif;
+        font-weight: 300;
+        font-size: clamp(18px, 3vw, 22px);
+        color: var(--accent);
+        margin-bottom: 48px;
+    }
+
+    .motivation-body {
+        font-family: 'DM Sans', sans-serif;
+        font-weight: 300;
+        font-size: 16px;
+        line-height: 1.7;
+        max-width: 480px;
+        color: rgba(248, 244, 239, 0.7);
+        margin-bottom: 56px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .toxic-btn {
+        display: inline-block;
+        background-color: var(--bg);
+        color: var(--text);
+        font-family: 'DM Sans', sans-serif;
+        font-weight: 300;
+        font-size: 14px;
+        padding: 16px 32px;
+        border-radius: 100px;
+        transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+    }
+
+    /* A hint of the "Toxic Mode" red on hover */
+    .toxic-btn:hover {
+        background-color: #A32020; 
+        color: #FFFFFF;
+        transform: scale(0.98);
+    }
+
+    .toxic-micro {
+        display: block;
+        margin-top: 16px;
+        font-family: 'DM Sans', sans-serif;
+        font-weight: 300;
+        font-size: 11px;
+        color: rgba(248, 244, 239, 0.4);
+        letter-spacing: 0.05em;
+    }
+</style>
+
+<section class="motivation-band">
+    <h2 class="motivation-head">Still waiting to feel motivated?</h2>
+    <h3 class="motivation-sub">That’s the problem.</h3>
+    
+    <div class="motivation-body">
+        <p>Most people don’t fail because they’re incapable.<br>
+        They fail because they wait until they <em>feel like doing it</em>.</p>
+        
+        <p>Motivation isn’t calm.<br>
+        Motivation is uncomfortable.</p>
+        
+        <p>If you need a push, try something different.</p>
+    </div>
+    
+    <div class="motivation-action">
+        <a href="toxic.html" class="toxic-btn">Try toxic motivation</a>
+        <span class="toxic-micro">But most people shouldn't.</span>
+    </div>
+</section>
 
     <footer class="footer">
         <div class="footer-brand">daytale</div>
