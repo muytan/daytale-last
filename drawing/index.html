@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Daytale - Draw</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300;1,400&family=DM+Sans:wght@300&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg: #F8F4EF;
+            --text: #18130F;
+            --accent: #B86B5A;
+            --muted: #8C7B74;
+            --hairline: #E2D9D3;
+            
+            --swatch-1: #18130F;
+            --swatch-2: #B86B5A;
+            --swatch-3: #C8A882;
+            --swatch-4: #8A9E85;
+            --swatch-5: #A49BC0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        a { text-decoration: none; }
+        input, button { font-family: inherit; outline: none; }
+
+        /* ZONE 1 - TOP BAR */
+        .top-bar {
+            height: 52px;
+            flex-shrink: 0;
+            background-color: var(--bg);
+            border-bottom: 1px solid var(--hairline);
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 10;
+        }
+
+        .date-display {
+            font-size: 12px;
+            color: var(--muted);
+            letter-spacing: 0.08em;
+            text-transform: lowercase;
+            width: 140px;
+        }
+
+        .daily-prompt {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 15px;
+            color: var(--text);
+            text-align: center;
+            flex: 1;
+            padding: 0 16px;
+        }
+
+        .archive-link {
+            font-size: 12px;
+            color: var(--muted);
+            width: 140px;
+            text-align: right;
+            transition: color 0.3s ease;
+        }
+        
+        .archive-link:hover {
+            color: var(--text);
+        }
+
+        /* ZONE 2 - CANVAS */
+        .canvas-zone {
+            flex-grow: 1;
+            position: relative;
+            background-color: var(--bg);
+            width: 100%;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            touch-action: none;
+            cursor: crosshair;
+        }
+
+        .read-only-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            pointer-events: none;
+            z-index: 5;
+            background-color: rgba(248, 244, 239, 0.4);
+        }
+
+        .read-only-overlay svg {
+            stroke: var(--muted);
+        }
+
+        .read-only-text {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        /* ZONE 3 - BOTTOM APP BAR */
+        .bottom-area {
+            flex-shrink: 0;
+            background-color: var(--bg);
+            border-top: 1px solid var(--hairline);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .action-row {
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 1px dashed var(--hairline);
+        }
+
+        .note-input {
+            flex-grow: 1;
+            max-width: 300px;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--hairline);
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 16px; 
+            color: var(--text);
+            padding: 4px 0;
+            margin-right: 24px;
+        }
+
+        .note-input::placeholder { color: var(--muted); }
+        .note-input:focus { border-bottom-color: var(--accent); }
+
+        .save-btn {
+            background-color: var(--text);
+            color: var(--bg);
+            font-size: 13px;
+            letter-spacing: 0.05em;
+            border: none;
+            border-radius: 100px;
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .save-btn:hover { background-color: var(--accent); }
+
+        .tools-row {
+            height: 72px;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .swatch-group, .tool-group, .size-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .swatch-group { gap: 12px; }
+        .tool-group { gap: 8px; }
+        .size-group { gap: 14px; }
+        
+        .swatch {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.2s ease;
+        }
+
+        .swatch.active {
+            box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--active-color);
+            transform: scale(1.1);
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            border-radius: 50%;
+            transition: color 0.2s ease, background-color 0.2s ease;
+        }
+
+        .icon-btn:hover { color: var(--text); background-color: rgba(0,0,0,0.03); }
+        .icon-btn svg { stroke: currentColor; }
+        .icon-btn.eraser-active { color: var(--accent); }
+
+        .size-btn {
+            border-radius: 50%;
+            background-color: var(--text);
+            border: none;
+            cursor: pointer;
+            opacity: 0.25;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        
+        .size-btn:hover { opacity: 0.5; }
+        .size-btn.active { opacity: 1; transform: scale(1.2); }
+        
+        .size-sm { width: 8px; height: 8px; }
+        .size-md { width: 12px; height: 12px; }
+        .size-lg { width: 16px; height: 16px; }
+
+        /* STEEL STAMP ANIMATION OVERLAY */
+        .save-anim-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(248, 244, 239, 0.75);
+            backdrop-filter: blur(2px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .save-anim-overlay.active {
+            opacity: 1;
+        }
+
+        .stamp-svg {
+            color: var(--accent);
+            transform: scale(3) rotate(-35deg);
+            opacity: 0;
+        }
+
+        .stamp-svg.slam {
+            /* The cubic-bezier here is the magic that creates the physical "slam and bounce" */
+            animation: stampDown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes stampDown {
+            0% { transform: scale(3) rotate(-35deg) translateY(-50px); opacity: 0; }
+            40% { opacity: 1; }
+            100% { transform: scale(1) rotate(-6deg) translateY(0); opacity: 0.95; }
+        }
+
+        /* MOBILE OVERRIDES */
+        @media (max-width: 768px) {
+            .daily-prompt { display: none; }
+            .date-display { width: auto; }
+            .archive-link { width: auto; }
+            
+            .action-row { padding: 16px; }
+            .tools-row { padding: 0 16px; }
+            .swatch-group { gap: 8px; }
+            .size-group { gap: 10px; }
+            
+            .swatch { width: 28px; height: 28px; }
+            .note-input { margin-right: 16px; font-size: 15px; }
+            .save-btn { padding: 12px 18px; }
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <header class="top-bar">
+        <div class="date-display" id="date-text"></div>
+        <div class="daily-prompt" id="prompt-text"></div>
+        <a href="archive.html" class="archive-link">archive</a>
+    </header>
+
+    <main class="canvas-zone" id="canvas-zone">
+        <canvas id="drawing-canvas"></canvas>
+        <div class="read-only-overlay" id="read-only-ui">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="5" y="11" width="14" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <span class="read-only-text">this day is sealed</span>
+        </div>
+    </main>
+
+    <footer class="bottom-area" id="bottom-area">
+        
+        <div class="action-row">
+            <input type="text" class="note-input" id="note-input" placeholder="a note for this moment" maxlength="140" autocomplete="off">
+            <button class="save-btn" id="save-btn">seal this day</button>
+        </div>
+
+        <div class="tools-row" id="tools-row">
+            <div class="swatch-group">
+                <button class="swatch active" style="background-color: var(--swatch-1); --active-color: var(--swatch-1);" data-color="#18130F"></button>
+                <button class="swatch" style="background-color: var(--swatch-2); --active-color: var(--swatch-2);" data-color="#B86B5A"></button>
+                <button class="swatch" style="background-color: var(--swatch-3); --active-color: var(--swatch-3);" data-color="#C8A882"></button>
+                <button class="swatch" style="background-color: var(--swatch-4); --active-color: var(--swatch-4);" data-color="#8A9E85"></button>
+                <button class="swatch" style="background-color: var(--swatch-5); --active-color: var(--swatch-5);" data-color="#A49BC0"></button>
+            </div>
+            
+            <div class="tool-group">
+                <button class="icon-btn" id="btn-undo" title="Undo">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                        <path d="M3 3v5h5"></path>
+                    </svg>
+                </button>
+                <button class="icon-btn" id="btn-eraser" title="Eraser">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+                        <line x1="4" y1="4" x2="20" y2="20"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="size-group">
+                <button class="size-btn size-sm" data-size="2"></button>
+                <button class="size-btn size-md active" data-size="5"></button>
+                <button class="size-btn size-lg" data-size="10"></button>
+            </div>
+        </div>
+    </footer>
+
+    <div class="save-anim-overlay" id="save-anim-overlay">
+        <svg width="200" height="200" viewBox="0 0 200 200" class="stamp-svg" id="stamp-svg">
+            <circle cx="100" cy="100" r="92" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="8 6 24 4 12 4" opacity="0.8"/>
+            <circle cx="100" cy="100" r="86" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.6"/>
+            <circle cx="100" cy="100" r="48" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+            
+            <path id="curve" d="M 30, 100 A 70,70 0 1,1 170,100 A 70,70 0 1,1 30,100" fill="none"/>
+            <text font-family="'DM Sans', sans-serif" font-size="15" font-weight="300" fill="currentColor" letter-spacing="0.25em" opacity="0.8">
+                <textPath href="#curve" startOffset="50%" text-anchor="middle">DAYTALE JOURNAL</textPath>
+            </text>
+            
+            <text x="100" y="108" font-family="'Cormorant Garamond', serif" font-style="italic" font-weight="400" font-size="38" fill="currentColor" text-anchor="middle">sealed</text>
+            <line x1="65" y1="120" x2="135" y2="120" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+            <text x="100" y="138" font-family="'DM Sans', sans-serif" font-size="11" font-weight="300" fill="currentColor" letter-spacing="0.1em" text-anchor="middle" id="stamp-date">DATE</text>
+        </svg>
+    </div>
+
+    <script>
+        // DATA
+        const PROMPTS = [
+            "draw the shadow resting on your wall right now", "a quiet detail from your morning", "the shape of how this week has felt",
+            "something you are trying to let go of", "your safe place in three simple shapes", "draw what rest looks like to you",
+            "the last thing that made you smile", "a detail from outside your window", "how your body feels right now as abstract lines",
+            "draw the mood of this hour", "something small you noticed today", "the feeling of this morning in lines and color",
+            "draw your energy right now", "a texture that matches your mood", "something you are waiting for",
+            "the shape of a sound you heard today", "draw what home feels like", "a moment from today you want to remember",
+            "how the light looks where you are right now", "draw something you are grateful for today", "the weight of something on your mind",
+            "a simple object near you right now", "how this season feels to you", "draw the space between where you are and where you want to be",
+            "something soft", "the feeling of sunday", "draw what silence looks like", "a color that matches today",
+            "something unfinished", "draw the end of this day"
+        ];
+
+        // DATE & PROMPT INITIALIZATION
+        const dateObj = new Date();
+        const options = { weekday: 'long', month: 'long', day: 'numeric' };
+        const dateString = dateObj.toLocaleDateString('en-US', options).toLowerCase();
+        
+        const year = dateObj.getFullYear();
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const storageKey = `daytale_${year}-${month}-${day}`;
+        
+        const shortMonth = dateObj.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
+        document.getElementById('stamp-date').textContent = `${shortMonth} ${day}, ${year}`;
+
+        const start = new Date(dateObj.getFullYear(), 0, 0);
+        const diff = dateObj - start;
+        const oneDay = 1000 * 60 * 60 * 24;
+        const dayOfYear = Math.floor(diff / oneDay);
+
+        document.getElementById('date-text').textContent = dateString;
+        document.getElementById('prompt-text').textContent = PROMPTS[dayOfYear % 30];
+
+        // DOM ELEMENTS
+        const canvasZone = document.getElementById('canvas-zone');
+        const canvas = document.getElementById('drawing-canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        
+        const readOnlyUI = document.getElementById('read-only-ui');
+        const noteInput = document.getElementById('note-input');
+        const saveBtn = document.getElementById('save-btn');
+        const toolsRow = document.getElementById('tools-row');
+        
+        const animOverlay = document.getElementById('save-anim-overlay');
+        const stampSvg = document.getElementById('stamp-svg');
+
+        // STATE
+        let isDrawing = false;
+        let lastPos = { x: 0, y: 0 };
+        let currentColor = '#18130F';
+        let currentSize = 5;
+        let isEraser = false;
+        let undoStack = [];
+        let isReadOnly = false;
+
+        // CANVAS INITIALIZATION & RESIZING
+        function initCanvas() {
+            setCanvasSize();
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            saveState();
+
+            const savedEntry = localStorage.getItem(storageKey);
+            if (savedEntry) {
+                isReadOnly = true;
+                const entryData = JSON.parse(savedEntry);
+                
+                const img = new Image();
+                img.onload = () => { ctx.drawImage(img, 0, 0); };
+                img.src = entryData.dataURL;
+
+                canvas.style.pointerEvents = 'none';
+                readOnlyUI.style.display = 'flex';
+                noteInput.value = entryData.note;
+                noteInput.disabled = true;
+                saveBtn.classList.add('hidden');
+                
+                toolsRow.style.opacity = '0.3';
+                toolsRow.style.pointerEvents = 'none';
+            }
+        }
+
+        function setCanvasSize() {
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = canvas.width;
+            tempCanvas.height = canvas.height;
+            if(canvas.width > 0) tempCtx.drawImage(canvas, 0, 0);
+
+            canvas.width = canvasZone.clientWidth;
+            canvas.height = canvasZone.clientHeight;
+            
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            if(tempCanvas.width > 0) ctx.drawImage(tempCanvas, 0, 0);
+        }
+
+        window.addEventListener('resize', setCanvasSize);
+
+        // DRAWING LOGIC
+        function getPointerPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top
+            };
+        }
+
+        canvas.addEventListener('pointerdown', (e) => {
+            if (isReadOnly) return;
+            isDrawing = true;
+            lastPos = getPointerPos(e);
+            
+            ctx.beginPath();
+            ctx.arc(lastPos.x, lastPos.y, (isEraser ? 20 : currentSize) / 2, 0, Math.PI * 2);
+            ctx.fillStyle = isEraser ? '#F8F4EF' : currentColor;
+            if (isEraser) {
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.fill();
+            } else {
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.fill();
+            }
+            ctx.beginPath();
+            ctx.moveTo(lastPos.x, lastPos.y);
+        });
+
+        canvas.addEventListener('pointermove', (e) => {
+            if (!isDrawing || isReadOnly) return;
+            const currentPos = getPointerPos(e);
+            
+            ctx.beginPath();
+            ctx.moveTo(lastPos.x, lastPos.y);
+            ctx.lineTo(currentPos.x, currentPos.y);
+
+            if (isEraser) {
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.lineWidth = 20;
+                ctx.strokeStyle = 'rgba(0,0,0,1)';
+            } else {
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.lineWidth = currentSize;
+                ctx.strokeStyle = currentColor;
+            }
+            
+            ctx.stroke();
+            lastPos = currentPos;
+        });
+
+        const endDrawing = () => {
+            if (isDrawing && !isReadOnly) {
+                isDrawing = false;
+                saveState();
+            }
+        };
+
+        canvas.addEventListener('pointerup', endDrawing);
+        canvas.addEventListener('pointerleave', endDrawing);
+
+        // UNDO LOGIC
+        function saveState() {
+            if (undoStack.length >= 20) undoStack.shift();
+            undoStack.push(canvas.toDataURL());
+        }
+
+        document.getElementById('btn-undo').addEventListener('click', () => {
+            if (isReadOnly || undoStack.length <= 1) return;
+            undoStack.pop(); 
+            const previousState = undoStack[undoStack.length - 1];
+            
+            const img = new Image();
+            img.onload = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.drawImage(img, 0, 0);
+            };
+            img.src = previousState;
+        });
+
+        // TOOLBAR UI LOGIC
+        const btnEraser = document.getElementById('btn-eraser');
+        btnEraser.addEventListener('click', () => {
+            if (isReadOnly) return;
+            isEraser = !isEraser;
+            if (isEraser) {
+                btnEraser.classList.add('eraser-active');
+            } else {
+                btnEraser.classList.remove('eraser-active');
+            }
+        });
+
+        document.querySelectorAll('.swatch').forEach(swatch => {
+            swatch.addEventListener('click', (e) => {
+                if (isReadOnly) return;
+                isEraser = false;
+                btnEraser.classList.remove('eraser-active');
+                
+                document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+                e.target.classList.add('active');
+                currentColor = e.target.getAttribute('data-color');
+            });
+        });
+
+        document.querySelectorAll('.size-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                if (isReadOnly) return;
+                document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                currentSize = parseInt(e.target.getAttribute('data-size'));
+            });
+        });
+
+        // SAVE LOGIC & STAMP ANIMATION
+        saveBtn.addEventListener('click', () => {
+            if (isReadOnly) return;
+            
+            const dataURL = canvas.toDataURL();
+            const noteText = noteInput.value.trim();
+            
+            const payload = {
+                date: `${year}-${month}-${day}`,
+                dataURL: dataURL,
+                note: noteText
+            };
+            
+            localStorage.setItem(storageKey, JSON.stringify(payload));
+            
+            // Trigger Rubber Stamp Animation
+            animOverlay.classList.add('active');
+            stampSvg.classList.add('slam');
+            
+            setTimeout(() => {
+                window.location.href = 'archive.html';
+            }, 1800);
+        });
+
+        window.onload = initCanvas;
+    </script>
+</body>
+</html>
