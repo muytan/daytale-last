@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Toxic Mode | Stop Pretending</title>
+    <title>Toxic Motivation | DayTale</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,11 +11,13 @@
     
     <style>
         :root {
-            --bg: #050505;
-            --text: #FFFFFF;
-            --accent: #FF0033;
-            --muted: #666666;
-            --border: #222222;
+            /* NEW EYE-CATCHING LIGHT THEME */
+            --bg: #FCF5F3;        /* Soft blush/beige background */
+            --text: #2D1B1E;      /* Very dark espresso/burgundy for high readability */
+            --accent: #E63946;    /* Punchy, vibrant red */
+            --muted: #A38A8D;     /* Dusty mauve/pink for secondary text */
+            --border: #F0DEDC;    /* Rose dust border */
+            --footer-bg: #F5EAE8; /* Slightly deeper beige for contrast sections */
         }
 
         * {
@@ -35,7 +37,7 @@
             overflow-x: hidden;
         }
 
-        /* GLITCH ANIMATION */
+        /* GLITCH ANIMATION (Updated for Light Theme) */
         @keyframes glitch {
             0% { transform: translate(0); }
             20% { transform: translate(-3px, 3px); text-shadow: -2px 0 var(--accent); }
@@ -62,6 +64,7 @@
             letter-spacing: -0.03em;
             text-transform: uppercase;
             margin-bottom: 16px;
+            color: var(--text);
         }
 
         .header p {
@@ -90,7 +93,7 @@
         .cat-btn {
             background: transparent;
             color: var(--muted);
-            border: 1px solid var(--muted);
+            border: 1px solid var(--border);
             padding: 12px 24px;
             font-family: inherit;
             font-weight: 700;
@@ -99,6 +102,7 @@
             letter-spacing: 0.1em;
             cursor: pointer;
             transition: all 0.2s ease;
+            border-radius: 4px;
         }
 
         .cat-btn:hover {
@@ -149,18 +153,20 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            border-radius: 4px;
         }
 
         .refresh-btn:hover {
-            color: var(--text);
-            border-color: var(--text);
+            color: var(--accent);
+            border-color: var(--accent);
+            background: rgba(230, 57, 70, 0.05);
         }
 
         /* FOOTER IDENTITY CHALLENGE */
         .footer-challenge {
             padding: 80px 24px;
             text-align: center;
-            background: #000000;
+            background: var(--footer-bg);
             border-top: 1px solid var(--border);
             display: flex;
             flex-direction: column;
@@ -172,6 +178,7 @@
             font-size: 32px;
             text-transform: uppercase;
             margin-bottom: 12px;
+            color: var(--text);
         }
 
         .footer-challenge p {
@@ -196,36 +203,40 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
             cursor: pointer;
-            transition: transform 0.2s ease, background 0.2s ease;
+            border-radius: 4px;
+            transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 8px 24px rgba(230, 57, 70, 0.25);
         }
 
         .prove-btn:hover {
-            background: #D9002B;
-            transform: scale(1.02);
+            background: #C92A36;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(230, 57, 70, 0.35);
         }
 
         .share-tag {
             position: absolute;
             top: -16px;
             right: -24px;
-            background: #FFFFFF;
-            color: #000000;
+            background: var(--text);
+            color: var(--bg);
             font-size: 11px;
             font-weight: 900;
             text-transform: uppercase;
             padding: 6px 10px;
             transform: rotate(6deg);
             pointer-events: none;
-            box-shadow: 2px 2px 0 var(--accent);
+            box-shadow: 3px 3px 0 var(--border);
             letter-spacing: 0.05em;
+            z-index: 2;
         }
 
         /* SHARE MODAL */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(10px);
+            background: rgba(45, 27, 30, 0.6);
+            backdrop-filter: blur(8px);
             display: none;
             align-items: center;
             justify-content: center;
@@ -238,11 +249,13 @@
         .modal-content {
             background: var(--bg);
             border: 1px solid var(--border);
+            border-radius: 8px;
             padding: 40px;
             max-width: 400px;
             width: 100%;
             text-align: center;
             position: relative;
+            box-shadow: 0 24px 48px rgba(45, 27, 30, 0.15);
         }
 
         .modal-close {
@@ -257,12 +270,14 @@
 
         .preview-canvas-container {
             width: 100%;
-            height: 45vh; /* Responsive height */
+            height: 45vh;
             max-height: 400px;
             aspect-ratio: 9/16;
-            background: #111;
+            background: #FFFFFF;
             margin: 0 auto 24px;
             border: 1px solid var(--border);
+            border-radius: 4px;
+            overflow: hidden;
         }
 
         canvas {
@@ -289,11 +304,13 @@
             text-transform: uppercase;
             cursor: pointer;
             transition: all 0.2s ease;
+            border-radius: 4px;
         }
 
         .action-btn.primary {
             background: var(--text);
             color: var(--bg);
+            border-color: var(--text);
         }
 
         .action-btn:hover { border-color: var(--text); }
@@ -450,7 +467,7 @@
         showQuote('study');
 
 
-        // --- SHARE & EXPORT LOGIC (9:16 IG STORY) ---
+        // --- SHARE & EXPORT LOGIC (LIGHT THEME UPDATE) ---
         const proveBtn = document.getElementById('prove-btn');
         const modal = document.getElementById('share-modal');
         const closeModal = document.getElementById('close-modal');
@@ -494,30 +511,30 @@
         }
 
         function renderCanvas() {
-            // 9:16 Background
-            ctx.fillStyle = '#050505';
+            // Light Theme 9:16 Background (Soft Blush)
+            ctx.fillStyle = '#FCF5F3';
             ctx.fillRect(0, 0, 1080, 1920);
 
             // Red accent dot/line
-            ctx.fillStyle = '#FF0033';
+            ctx.fillStyle = '#E63946';
             ctx.fillRect(80, 500, 30, 30);
 
-            // Typography (Centered-ish vertically for Stories)
-            ctx.fillStyle = '#FFFFFF';
+            // Typography (Dark Espresso)
+            ctx.fillStyle = '#2D1B1E';
             ctx.font = '900 96px "DM Sans", sans-serif';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
 
             wrapText(ctx, currentQuote, 80, 600, 920, 110);
 
-            // Footer branding (DAYTALE MOTIVATION)
+            // Footer branding
             const bottomY = 1700;
             ctx.font = '700 48px "DM Sans", sans-serif';
-            ctx.fillStyle = '#FFFFFF';
+            ctx.fillStyle = '#2D1B1E';
             ctx.fillText("DAYTALE", 80, bottomY);
             
             let metrics = ctx.measureText("DAYTALE  ");
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.fillStyle = 'rgba(45, 27, 30, 0.3)'; // Semi-transparent dark
             ctx.fillText("MOTIVATION", 80 + metrics.width, bottomY);
         }
 
